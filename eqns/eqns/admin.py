@@ -21,7 +21,12 @@ site.register(Constant, ConstantAdmin)
 
 
 class EquationAdmin(ModelAdmin):
+    def nbr_vars(self, obj):
+        return obj.variables.count()
+        
     list_display = ['name', 'sympy', 'category']
+    list_filter = ['category']
+    filter_horizontal = ['variables', 'constants']
     
 site.register(Equation, EquationAdmin)
 
