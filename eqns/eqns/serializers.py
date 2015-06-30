@@ -18,7 +18,7 @@ class VariableSerializer(ModelSerializer):
 class ConstantSerializer(ModelSerializer):
     class Meta:
         model = Constant
-        fields = ['symbol', 'name', 'value', 'unit']
+        # fields = ['symbol', 'name', 'value', 'unit']
         
         
 class CategorySerializer(HyperlinkedModelSerializer):
@@ -28,8 +28,8 @@ class CategorySerializer(HyperlinkedModelSerializer):
         
         
 class EquationSerializer(ModelSerializer):
-    category = RelatedField(source='category', read_only=True)
-    variables = VariableSerializer()
+    category = StringRelatedField(read_only=True)
+    # variables = VariableSerializer()
     constants = ConstantSerializer()
     
     class Meta:
