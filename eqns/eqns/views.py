@@ -19,9 +19,19 @@ class ConstantViewSet(ReadOnlyModelViewSet):
     serializer_class = ConstantSerializer
 
     
-class CategoryViewSet(ReadOnlyModelViewSet):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+class SubjectViewSet(ReadOnlyModelViewSet):
+    queryset = Subject.objects.all()
+    serializer_class = SubjectSerializer
+    
+
+class SystemViewSet(ReadOnlyModelViewSet):
+    queryset = System.objects.all()
+    serializer_class = SystemSerializer
+    
+
+class LimitationViewSet(ReadOnlyModelViewSet):
+    queryset = Limitation.objects.all()
+    serializer_class = LimitationSerializer
     
 
 class EquationViewSet(ReadOnlyModelViewSet):

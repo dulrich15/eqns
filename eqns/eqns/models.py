@@ -42,7 +42,7 @@ class Constant(Model):
         ordering = ['symbol']
     
     
-class Category(Model):
+class Subject(Model):
     name = CharField(max_length=200)
     sort_order = PositiveSmallIntegerField(default=0)
     
@@ -51,21 +51,42 @@ class Category(Model):
         
     class Meta:
         ordering = ['sort_order', 'name']
-        verbose_name_plural = 'categories'
-        
-        
-class Equation(Model):
+
+
+class System(Model):
     name = CharField(max_length=200)
-    category = ForeignKey(Category)
-    sympy = TextField()
-    latex = TextField(null=True, blank=True)
-    variables = ManyToManyField(Variable, blank=True)
-    constants = ManyToManyField(Constant, blank=True)
+    sort_order = PositiveSmallIntegerField(default=0)
     
     def __unicode__(self):
         return self.name
         
     class Meta:
-        ordering = ['category', 'name']
+        ordering = ['sort_order', 'name']
+
+
+class Limitation(Model):
+    name = CharField(max_length=200)
+    sort_order = PositiveSmallIntegerField(default=0)
+    
+    def __unicode__(self):
+        return self.name
         
+    class Meta:
+        ordering = ['sort_order', 'name']
+    
+    
+class Equation(Model):
+    name = CharField(max_length=200)
+    subject = ForeignKey(Subject)
+    system = ForeignKey(System)
+    sympy = TextField()
+    latex = TextField(null=True, blank=True)
+    variables = ManyToManyField(Variable, blank=True)
+    constants = ManyToManyField(Constant, blank=True)
+    limitations = ManyToManyField(Limitation, blank=True)
+    
+    def __unicode__(self):
+        return self.name
         
+    class Meta:
+        ordering = ['subject', 'system', 'name']

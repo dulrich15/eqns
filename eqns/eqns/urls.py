@@ -5,10 +5,12 @@ from . import views
 
 router = routers.DefaultRouter()
 router.register('equations', views.EquationViewSet)
-router.register('categories', views.CategoryViewSet)
+router.register('subjects', views.SubjectViewSet)
+router.register('systems', views.SystemViewSet)
 router.register('variables', views.VariableViewSet)
 router.register('constants', views.ConstantViewSet)
 router.register('units', views.UnitViewSet)
+router.register('limitations', views.LimitationViewSet)
 
 urlpatterns = patterns('', 
     url(r'api/', include(router.urls)),

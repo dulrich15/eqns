@@ -8,29 +8,41 @@ class UnitSerializer(ModelSerializer):
         
         
 class VariableSerializer(ModelSerializer):
-    unit = HyperlinkedRelatedField(many=True, read_only=True, view_name='unit-detail')
+    unit = UnitSerializer()
     
     class Meta:
         model = Variable
-        fields = ['symbol', 'name', 'unit']
-        
+
         
 class ConstantSerializer(ModelSerializer):
+    unit = UnitSerializer()
+
     class Meta:
         model = Constant
-        # fields = ['symbol', 'name', 'value', 'unit']
+
         
-        
-class CategorySerializer(HyperlinkedModelSerializer):
+class SubjectSerializer(ModelSerializer):
     class Meta:
-        model = Category
-        fields = ['url', 'name', 'sort_order']
+        model = Subject
+
+class SystemSerializer(ModelSerializer):
+    class Meta:
+        model = System
+
         
+class LimitationSerializer(ModelSerializer):
+    class Meta:
+        model = Limitation
+
         
 class EquationSerializer(ModelSerializer):
-    category = StringRelatedField(read_only=True)
-    # variables = VariableSerializer()
-    constants = ConstantSerializer()
-    
+    subject = SubjectSerializer()
+    system = SystemSerializer()
+    variables = VariableSerializer(many=True)
+    constants = ConstantSerializer(many=True)
+    limitations = LimitationSerializer(many=True)
+
     class Meta:
         model = Equation
+        fields = ['url', 'name', 'sympy', 'latex', 'subject', 'system', 'variables', 'constants', 'limitations']
+    

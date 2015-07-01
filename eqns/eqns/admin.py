@@ -24,14 +24,26 @@ class EquationAdmin(ModelAdmin):
     def nbr_vars(self, obj):
         return obj.variables.count()
         
-    list_display = ['name', 'sympy', 'category']
-    list_filter = ['category']
-    filter_horizontal = ['variables', 'constants']
+    list_display = ['name', 'sympy', 'subject', 'system']
+    list_filter = ['subject', 'system']
+    filter_horizontal = ['variables', 'constants', 'limitations']
     
 site.register(Equation, EquationAdmin)
 
 
-class CategoryAdmin(ModelAdmin):
+class SubjectAdmin(ModelAdmin):
     list_display = ['name', 'sort_order']
     
-site.register(Category, CategoryAdmin)
+site.register(Subject, SubjectAdmin)
+
+
+class SystemAdmin(ModelAdmin):
+    list_display = ['name', 'sort_order']
+    
+site.register(System, SystemAdmin)
+
+
+class LimitationAdmin(ModelAdmin):
+    list_display = ['name', 'sort_order']
+    
+site.register(Limitation, LimitationAdmin)
