@@ -1,3 +1,5 @@
-# eqns
+eqns
+----
 
-Physics equations API
+A Django-based physics equations API.
+
