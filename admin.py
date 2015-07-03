@@ -21,10 +21,11 @@ site.register(Constant, ConstantAdmin)
 
 
 class EquationAdmin(ModelAdmin):
-    def nbr_vars(self, obj):
-        return obj.variables.count()
+    def has_limitations(self, obj):
+        return (obj.limitations.count() > 0)
+    has_limitations.boolean = True
 
-    list_display = ['name', 'sympy', 'subject', 'system', 'nbr_vars']
+    list_display = ['name', 'sympy', 'subject', 'system', 'has_limitations']
     list_filter = ['subject', 'system']
     filter_horizontal = ['variables', 'constants', 'limitations']
 
