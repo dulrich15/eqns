@@ -15,8 +15,6 @@ class VariableSerializer(ModelSerializer):
 
         
 class ConstantSerializer(ModelSerializer):
-    unit = UnitSerializer()
-
     class Meta:
         model = Constant
 

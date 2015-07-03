@@ -9,7 +9,8 @@ from django.shortcuts import render
 def show_equations(request):
     base_url = 'http://' + request.get_host().split(':')[0]
     r = requests.get(base_url + '/eqns/api/equations/')
-    context = { 'json': r.json }
+    json = r.json
+    context = { 'json': json }
     template = 'show_equations.html'
     return render(request, template, context)
 

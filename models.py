@@ -33,8 +33,8 @@ class Constant(Model):
     symbol = CharField(max_length=200)
     name = CharField(max_length=200, null=True, blank=True)
     value = FloatField()
-    unit = ForeignKey(Unit, null=True, blank=True)
-    
+    unit = CharField(max_length=200, null=True, blank=True)
+
     def __unicode__(self):
         return '{self.symbol} = {self.value:.3g} {self.unit} ({self.name})'.format(self=self)
         
@@ -78,7 +78,7 @@ class Limitation(Model):
 class Equation(Model):
     name = CharField(max_length=200)
     subject = ForeignKey(Subject)
-    system = ForeignKey(System)
+    system = ForeignKey(System,null=True, blank=True)
     sympy = TextField()
     latex = TextField(null=True, blank=True)
     variables = ManyToManyField(Variable, blank=True)
