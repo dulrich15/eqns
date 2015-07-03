@@ -1,3 +1,20 @@
+from __future__ import division
+from __future__ import unicode_literals
+
+import requests
+
+from django.shortcuts import redirect
+from django.shortcuts import render
+
+def show_equations(request):
+    base_url = 'http://' + request.get_host().split(':')[0]
+    r = requests.get(base_url + '/eqns/api/equations/')
+    context = { 'json': r.json }
+    template = 'show_equations.html'
+    return render(request, template, context)
+
+## -- Django REST Framework API support -- ##
+
 from rest_framework.viewsets import *
 
 from models import *

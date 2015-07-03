@@ -15,4 +15,5 @@ router.register('limitations', views.LimitationViewSet)
 urlpatterns = patterns('', 
     url(r'api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^$', views.show_equations),
 )

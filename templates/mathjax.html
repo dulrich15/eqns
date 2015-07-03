@@ -1,0 +1,23 @@
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["\\(", "\\)"], ["$", "$"] ]
+        },
+        TeX: {
+            extensions: ["AMSmath.js", "AMSsymbols.js"],
+            Macros: {
+                implies:    "\\Rightarrow",
+                half:       "{\\tfrac{1}{2}}",
+                dg:         "{^\\circ}",
+                unit:       ["{\\text{ #1}}", 1],
+                vect:       ["{\\boldsymbol{#1}}", 1],
+                vhat:       ["{\\hat{\\boldsymbol{#1}}}", 1],
+                vmag:       ["{\\text{mag} \\vect{#1}}", 1],
+                vang:       ["{\\text{ang} \\vect{#1}}", 1],
+                sci:        ["{#1 \\times 10^{#2}}", 2],
+                abs:        ["{\\left\\vert #1 \\right\\vert}", 1],
+            }
+        }
+    });
+</script>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
