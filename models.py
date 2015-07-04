@@ -14,7 +14,7 @@ class Unit(Model):
         return self.name if self.name else self.symbol
 
     class Meta:
-        ordering = ['symbol']
+        ordering = ['name', 'symbol']
 
 
 class Variable(Model):
@@ -92,4 +92,4 @@ class Equation(Model):
         return self.name
 
     class Meta:
-        ordering = ['subject', 'system', 'name']
+        ordering = ['system', 'subject', 'name']
