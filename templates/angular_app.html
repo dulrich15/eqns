@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="eqnApp">
+<head>
+    <title>Physics 200 equation list</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="bootstrap.css" rel="stylesheet" />
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            skipStartupTypeset: true,
+            showMathMenu: false,
+            MathEvents: {button: {src: ""}},
+			imageFont: null,
+            tex2jax: {
+                inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+                displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            },
+            TeX: {
+                extensions: ["AMSmath.js","AMSsymbols.js"],
+            }
+        });
+    </script>
+<!--    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+<!--    <script type="text/javascript" src="mathjax/MathJax.js?config=TeX-AMS_HTML"></script> -->
+
+    <script src="angular.js"></script>
+    <script>
+
+        var eqnApp = angular.module("eqnApp", []);
+
+        // http://jsfiddle.net/spicyj/YpqVp/
+        eqnApp.directive("mathjaxBind", function() {
+		    return {
+                restrict: "A",
+                controller: ["$scope", "$element", "$attrs",
+                        function($scope, $element, $attrs) {
+                    $scope.$watch($attrs.mathjaxBind, function(value) {
+                        var $script = angular.element("<script type='math/tex'>")
+                            .html(value == undefined ? "" : value);
+                        $element.html("");
+                        $element.append($script);
+                        MathJax.Hub.Queue(["Reprocess", MathJax.Hub, $element[0]]);
+                    });
+                }]
+            };
+        });
+
+        eqnApp.controller("eqnCtrl", function ($scope, $http) {
+            $scope.eqns = [];
+            $scope.filters = {};
+
+            $http.get("eqns/api/equations/")
+            .success(function (data) {
+                $scope.eqns = data;
+            });
+        });
+
+    </script>
+
+    <style>
+        body { margin:0 1em; }
+        dl { margin:1em 0; }
+        dt { display:list-item; margin-left:2em; }
+        dd { margin:0.5em 0 1em 2em; }
+        a { cursor:pointer; }
+    </style>
+</head>
+
+<body ng-controller="eqnCtrl">
+
+    <h2>Equation List</h2>
+    <p>
+        <input type="search" ng-model="q" placeholder="Filter equations..." />
+        <a ng-click="filters.subject = ''">Clear subject filter</a>
+    </p>
+    <dl id="eqn-list">
+    <div ng-repeat="eqn in eqns | filter:filters | filter:q">
+        <dt>{{ eqn.name }} (<a ng-click="filters.subject = eqn.subject.name">{{ eqn.subject.name }}</a>)</dt>
+        <dd><span mathjax-bind="eqn.latex"></span></dd>
+    </div>
+    </dl>
+
+</body>
+</html>

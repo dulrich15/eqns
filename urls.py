@@ -12,8 +12,9 @@ router.register('constants', views.ConstantViewSet)
 router.register('units', views.UnitViewSet)
 router.register('limitations', views.LimitationViewSet)
 
-urlpatterns = patterns('', 
-    url(r'api/', include(router.urls)),
+urlpatterns = patterns('',
+    url(r'^api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^$', views.show_equations),
+    url(r'^app/$', views.angular_app),
 )

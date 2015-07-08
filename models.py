@@ -11,10 +11,13 @@ class Unit(Model):
     equivalent = CharField(max_length=200, null=True, blank=True)
 
     def __unicode__(self):
-        return self.name if self.name else self.symbol
+        if self.name:
+            return '{self.symbol} ({self.name})'.format(self=self)
+        else:
+            return self.symbol
 
     class Meta:
-        ordering = ['name', 'symbol']
+        ordering = ['symbol', 'name']
 
 
 class Variable(Model):
@@ -26,7 +29,7 @@ class Variable(Model):
         return '{self.symbol} = {self.name}'.format(self=self)
 
     class Meta:
-        ordering = ['symbol']
+        ordering = ['name']
 
 
 class Constant(Model):
@@ -39,10 +42,10 @@ class Constant(Model):
         if self.value and self.unit:
             return '{self.symbol} = {self.value:.3g} {self.unit} ({self.name})'.format(self=self)
         else:
-            return '{self.symbol} ({self.name})'.format(self=self)
+            return '{self.symbol} = {self.name}'.format(self=self)
 
     class Meta:
-        ordering = ['symbol']
+        ordering = ['name', 'symbol']
 
 
 class Subject(Model):
@@ -92,4 +95,4 @@ class Equation(Model):
         return self.name
 
     class Meta:
-        ordering = ['system', 'subject', 'name']
+        ordering = ['subject', 'system', 'name']
