@@ -95,4 +95,4 @@ class Equation(Model):
         return self.name
 
     class Meta:
-        ordering = ['subject', 'system', 'name']
+        ordering = ['subject', 'name']
