@@ -42,5 +42,5 @@ class EquationSerializer(ModelSerializer):
 
     class Meta:
         model = Equation
-        fields = ['name', 'sympy', 'latex', 'subject', 'system', 'variables', 'constants', 'limitations']
+        # fields = ['name', 'sympy', 'latex', 'subject', 'system', 'variables', 'constants', 'limitations']
     
