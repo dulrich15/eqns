@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+<p>
+    {% if prev_page %}
+        <a href="{% url 'index' %}?page={{ prev_page }}">&laquo; Prev</a>
+    {% else %}
+        <span style="color:#eee">&laquo; Prev</span>
+    {% endif %}
+    |
+    {% if next_page %}
+        <a href="{% url 'index' %}?page={{ next_page }}">Next &raquo;</a>
+    {% else %}
+        <span style="color:#eee">Next &raquo;</span>
+    {% endif %}
+</p>
+<dl>
+    {% for eqn in eqns %}
+    <dt><a href="{{ eqn.id }}/">{{ eqn.name }}</a></dt>
+    <dd>${{ eqn.latex }}$</dd>
+    {% endfor %}
+</dl>
+
+{% endblock %}

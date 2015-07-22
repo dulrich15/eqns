@@ -12,7 +12,7 @@ class Unit(Model):
 
     def __unicode__(self):
         if self.name:
-            return '{self.symbol} ({self.name})'.format(self=self)
+            return self.name
         else:
             return self.symbol
 
