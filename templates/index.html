@@ -2,6 +2,33 @@
 
 {% block body %}
 
+<dl>
+    {% for eqn in eqns %}
+    {% if user.is_staff %}
+    <p></p>
+    {% endif %}
+    <dt>
+        <a href="{{ eqn.id }}/">{{ eqn.name }}</a>
+    </dt>
+    <dd>${{ eqn.latex }}$</dd>
+    {% if user.is_staff %}
+    <a href="{% url 'admin:eqns_equation_change' eqn.id %}" target="_blank">Edit</a>
+    {% endif %}
+    <dd>
+        <ul>
+            {% for v in eqn.variables %}
+            <li>{{ v.symbol }}, {{ v.name }}</li>
+            {% endfor %}
+        </ul>
+        <ul>
+            {% for c in eqn.constants %}
+            <li>{{ c.symbol }}, {{ c.name }}</li>
+            {% endfor %}
+        </ul>
+    </dd>
+    {% endfor %}
+</dl>
+
 <p>
     {% if prev_page %}
         <a href="{% url 'index' %}?page={{ prev_page }}">&laquo; Prev</a>
@@ -15,11 +42,5 @@
         <span style="color:#eee">Next &raquo;</span>
     {% endif %}
 </p>
-<dl>
-    {% for eqn in eqns %}
-    <dt><a href="{{ eqn.id }}/">{{ eqn.name }}</a></dt>
-    <dd>${{ eqn.latex }}$</dd>
-    {% endfor %}
-</dl>
 
 {% endblock %}
