@@ -4,26 +4,19 @@
 
 <p><a href="{% url 'index' %}">&laquo; Back to list</a></p>
 <h2>{{ eqn.name }}</h2>
-<p>${{ eqn.latex }}$</p>
-{% if user.is_staff %}
-<p><a href="{% url 'admin:eqns_equation_change' eqn.id %}" target="_blank">Edit</a></p>
-{% endif %}
-
-<!--{{ eqn.sympy }}-->
-
-<p>{{ eqn.solution }}</p>
-<p>Solved as</p>
-<ul>
-    <li>{{ x.name }}, {{ x.symbol }} = {{ x.value }}</li>
-</ul>
+<p>{{ eqn.sympy }}</p>
 <p>Using the following parameters:</p>
 <ul>
     {% for p in parameters %}
     <li>{{ p.name }}, {{ p.symbol }} = {{ p.value }}</li>
     {% endfor %}
 </ul>
+<p>The solution is:</p>
+<ul>
+    <li>{{ x.name }}, {{ x.symbol }} = {{ x.value }}</li>
+</ul>
 
-<form action="" method="get">
+<form action="{% url 'show_equation' eqn.id %}" method="get">
 <p><button tabindex=1>Again</button></p>
 </form>
 

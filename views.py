@@ -3,8 +3,25 @@ from __future__ import unicode_literals
 
 import requests
 
+from sympy import solve
+from sympy import sympify
+from sympy import Eq
+from sympy import Symbol
+
 from django.shortcuts import redirect
 from django.shortcuts import render
+
+
+api_url = 'http://django-apps-dulrich15.c9.io/eqns/api/'
+
+
+def call_eqn_api(pk=None, pg=1):
+    if pk: # pull the equation
+        url = api_url + '{}/'.format(pk)
+    else: # get a list instead
+        url = api_url + '?page={}'.format(pg)
+    return requests.get(url).json()
+
 
 def list_equations(request):
     try:
@@ -12,8 +29,7 @@ def list_equations(request):
     except:
         pg = 1
 
-    url = 'http://{}/eqns/api/?page={}'.format(request.get_host().split(':')[0], pg)
-    data = requests.get(url).json()
+    data = call_eqn_api(pg=pg)
 
     next_page = prev_page = None
     if data['next']:
@@ -31,49 +47,53 @@ def list_equations(request):
 
 
 def show_equation(request, pk):
-    url = 'http://{}/eqns/api/{}'.format(request.get_host().split(':')[0], pk)
-    eqn = requests.get(url).json()
+    context = {
+        'eqn': call_eqn_api(pk=pk)
+    }
+    template = 'show_equation.html'
+    return render(request, template, context)
+
+
+def show_solution(request, pk):
+    eqn = call_eqn_api(pk=pk)
+    LHS, RHS = eqn['sympy'].split('=')
+    e = Eq(sympify(LHS), sympify(RHS))
+    # voi = None
+
+    variables = []
+    vals = dict()
+    for v in eqn['variables']:
+        if v['name'] in request.POST: # really, they all ought to be...
+            val = request.POST[v['name']]
+            if val == '?':
+                voi = Symbol(v['symbol'])
+                unknown = v
+            else:
+                try:
+                    value = float(val)
+                    vals[Symbol(v['symbol'])] = value
+                    v['value'] = value
+                except:
+                    v['value'] = 'Not given'
+                variables.append(v)
+
+    constants = []
+    for c in eqn['constants']:
+        vals[Symbol(c['symbol'])] = c['value']
+        constants.append(c)
+
+    answers = solve(e.subs(vals),voi)
+    answer = answers[0]
+    unknown['value'] = answer
 
     context = {
         'eqn': eqn,
+        'constants': constants,
+        'variables': variables,
+        'parameters': variables + constants,
+        'x': unknown,
     }
-    template = 'show_equation.html'
-
-
-    if request.POST:
-        parameters = eqn['constants']
-        x = eqn['variables'][:] # copy this list
-        for v in eqn['variables']:
-            print v
-            if v['name'] not in request.POST:
-                v['value'] = 'Not given'
-                paramters.append(v)
-            else: # we have a variable
-                if request.POST[v['name']] == "?":
-                    x = [v]
-                else: # we have a value
-                    try:
-                        v['value'] = float(request.POST[v['name']])
-                        parameters.append(v)
-                        x.remove(v)
-                    except: # error: input is not a float
-                        v['value'] = 'Not Given'
-                        parameters += [v]
-
-        if len(x) != 1:
-            return render(request, 'show_error.html', {})
-        else:
-            x = x[0]
-
-        x['value'] = 100
-
-        context.update({
-            'pst': request.POST,
-            'parameters': parameters,
-            'x': x,
-        })
-        template = 'show_solution.html'
-
+    template = 'show_solution.html'
     return render(request, template, context)
 
 

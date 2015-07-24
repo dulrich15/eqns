@@ -11,7 +11,7 @@
 
 <!--{{ eqn.sympy }}-->
 
-<form action="" method="post">
+<form action="{% url 'show_solution' eqn.id %}" method="post">
 <table>
 {% for c in eqn.constants %}
 <tr>
