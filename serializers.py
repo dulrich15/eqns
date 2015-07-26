@@ -2,16 +2,16 @@ from rest_framework.serializers import *
 from models import *
 
 
-# class UnitSerializer(ModelSerializer):
-class UnitSerializer(HyperlinkedModelSerializer):
+class UnitSerializer(ModelSerializer):
+# class UnitSerializer(HyperlinkedModelSerializer):
     class Meta:
         model = Unit
 
 
-# class VariableSerializer(ModelSerializer):
-    # unit = UnitSerializer()
-class VariableSerializer(HyperlinkedModelSerializer):
-    unit = HyperlinkedRelatedField(view_name='unit-detail', read_only=True)
+class VariableSerializer(ModelSerializer):
+    unit = UnitSerializer()
+# class VariableSerializer(HyperlinkedModelSerializer):
+#     unit = HyperlinkedRelatedField(view_name='unit-detail', read_only=True)
 
     class Meta:
         model = Variable
@@ -36,18 +36,18 @@ class LimitationSerializer(ModelSerializer):
         model = Limitation
 
 
-# class EquationSerializer(ModelSerializer):
-#     subject = SubjectSerializer()
-#     system = SystemSerializer()
-#     variables = VariableSerializer(many=True)
-#     constants = ConstantSerializer(many=True)
-#     limitations = LimitationSerializer(many=True)
-class EquationSerializer(HyperlinkedModelSerializer):
+class EquationSerializer(ModelSerializer):
     subject = SubjectSerializer()
     system = SystemSerializer()
-    variables = HyperlinkedRelatedField(view_name='variable-detail', many=True, read_only=True)
+    variables = VariableSerializer(many=True)
     constants = ConstantSerializer(many=True)
     limitations = LimitationSerializer(many=True)
+# class EquationSerializer(HyperlinkedModelSerializer):
+#     subject = SubjectSerializer()
+#     system = SystemSerializer()
+#     variables = HyperlinkedRelatedField(view_name='variable-detail', many=True, read_only=True)
+#     constants = ConstantSerializer(many=True)
+#     limitations = LimitationSerializer(many=True)
 
     class Meta:
         model = Equation

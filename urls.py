@@ -22,7 +22,7 @@ router.register(r'variables', views.VariableViewSet)
 router.register(r'units', views.UnitViewSet)
 
 urlpatterns = patterns('',
-    url(r'^$', views.list_equations, name='index'),
+    url(r'^$', views.list_equations, name='list_equations'),
     url(r'^(?P<pk>[0-9]+)/$', views.show_equation, name='show_equation'),
     url(r'^(?P<pk>[0-9]+)/solution/$', views.show_solution, name='show_solution'),
 

@@ -12,7 +12,7 @@
     </dt>
     <dd>${{ eqn.latex }}$</dd>
     {% if user.is_staff %}
-    <a href="{% url 'admin:eqns_equation_change' eqn.id %}" target="_blank">Edit</a>
+    <a style="float:right" href="{% url 'admin:eqns_equation_change' eqn.id %}" target="_blank">Edit</a>
     {% endif %}
     <dd>
         <ul>
@@ -31,13 +31,13 @@
 
 <p>
     {% if prev_page %}
-        <a href="{% url 'index' %}?page={{ prev_page }}">&laquo; Prev</a>
+        <a href="{% url 'list_equations' %}?page={{ prev_page }}">&laquo; Prev</a>
     {% else %}
         <span style="color:#eee">&laquo; Prev</span>
     {% endif %}
     |
     {% if next_page %}
-        <a href="{% url 'index' %}?page={{ next_page }}">Next &raquo;</a>
+        <a href="{% url 'list_equations' %}?page={{ next_page }}">Next &raquo;</a>
     {% else %}
         <span style="color:#eee">Next &raquo;</span>
     {% endif %}

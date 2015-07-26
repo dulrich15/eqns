@@ -12,7 +12,8 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 
 
-api_url = 'http://django-apps-dulrich15.c9.io/eqns/api/'
+api_url = 'http://django-apps-dulrich15.c9.io/eqns/api/equations/'
+# api_url = 'http://django-apps-dulrich15.c9.io/eqns/api/variables/107/equations/'
 
 
 def call_eqn_api(pk=None, pg=1):
@@ -32,9 +33,9 @@ def list_equations(request):
     data = call_eqn_api(pg=pg)
 
     next_page = prev_page = None
-    if data['next']:
+    if 'next' in data:
         next_page = pg + 1
-    if data['previous']:
+    if 'previous' in data:
         prev_page = pg - 1
 
     context = {
@@ -42,7 +43,7 @@ def list_equations(request):
         'next_page' : next_page,
         'prev_page' : prev_page,
     }
-    template = 'index.html'
+    template = 'list_equations.html'
     return render(request, template, context)
 
 
@@ -79,7 +80,6 @@ def show_solution(request, pk):
 
     if voi is None:
         return render(request, 'show_error.html', {})
-
 
     constants = []
     for c in eqn['constants']:
