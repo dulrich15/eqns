@@ -58,7 +58,7 @@ def show_solution(request, pk):
     eqn = call_eqn_api(pk=pk)
     LHS, RHS = eqn['sympy'].split('=')
     e = Eq(sympify(LHS), sympify(RHS))
-    # voi = None
+    voi = None
 
     variables = []
     vals = dict()
@@ -76,6 +76,10 @@ def show_solution(request, pk):
                 except:
                     v['value'] = 'Not given'
                 variables.append(v)
+
+    if voi is None:
+        return render(request, 'show_error.html', {})
+
 
     constants = []
     for c in eqn['constants']:
@@ -99,19 +103,85 @@ def show_solution(request, pk):
 
 ## -- Django REST Framework API support -- ##
 
-
 from rest_framework.viewsets import *
 
 from models import *
 from serializers import *
+from rest_framework import filters
 from rest_framework import generics
+from rest_framework import viewsets
+from rest_framework.decorators import detail_route
+from rest_framework.response import Response
+
+import django_filters
 
 
-class EquationList(generics.ListCreateAPIView):
+# class EquationFilter(django_filters.FilterSet):
+#     system = django_filters.CharFilter(name="system__name")
+#     subject = django_filters.CharFilter(name="subject__name")
+
+#     class Meta:
+#         model = Equation
+#         fields = ['system', 'subject', 'name']
+
+
+class EquationViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Equation.objects.all()
     serializer_class = EquationSerializer
 
+    filter_backends = [filters.DjangoFilterBackend, filters.SearchFilter]
+    # filter_class = EquationFilter
+    filter_fields = ['system', 'subject', 'name']
+    search_fields = ['subject__name', 'system__name', 'name']
 
-class EquationDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Equation.objects.all()
-    serializer_class = EquationSerializer
+
+class VariableViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Variable.objects.all()
+    serializer_class = VariableSerializer
+
+    filter_backends = [filters.DjangoFilterBackend, filters.SearchFilter]
+    filter_fields = ['name']
+    search_fields = ['name', 'unit__name']
+
+    @detail_route(url_path='equations')
+    def get_equation_list(self, request, *args, **kwargs):
+        equation_list = Equation.objects.filter(variables=self.get_object())
+        serializer = EquationSerializer(equation_list, many=True, context={'request': request})
+        return Response(serializer.data)
+
+
+class UnitViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Unit.objects.all()
+    serializer_class = UnitSerializer
+
+    filter_backends = [filters.DjangoFilterBackend, filters.SearchFilter]
+    filter_fields = ['name', 'symbol']
+    search_fields = ['name', 'symbol']
+
+    @detail_route(url_path='variables')
+    def get_variables_list(self, request, *args, **kwargs):
+        variable_list = Variable.objects.filter(unit=self.get_object())
+        serializer = VariableSerializer(variable_list, many=True, context={'request': request})
+        return Response(serializer.data)
+
+
+# class VariableList(generics.ListCreateAPIView):
+#     queryset = Variable.objects.all()
+#     serializer_class = VariableSerializer
+
+#     filter_backends = (filters.DjangoFilterBackend,filters.SearchFilter)
+#     search_fields = ['name']
+
+
+# class VariableDetail(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Variable.objects.all()
+#     serializer_class = VariableSerializer
+
+
+# class VariableEquationList(generics.ListCreateAPIView):
+#     queryset = Equation.objects.filter(variables=pk)
+#     serializer_class = EquationSerializer
+
+#     def get(self, request, *args, **kwargs):
+#             snippet = self.get_object()
+#             return Response(snippet.highlighted)
