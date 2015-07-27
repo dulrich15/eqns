@@ -67,7 +67,7 @@ def show_solution(request, pk):
         if v['name'] in request.POST: # really, they all ought to be...
             val = request.POST[v['name']]
             if val == '?':
-                voi = Symbol(v['symbol'])
+                voi = Symbol(v['symbol']) # upgrade sympy to 0.7.6 if this throws a unicode error
                 unknown = v
             else:
                 try:
