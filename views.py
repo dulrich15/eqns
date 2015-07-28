@@ -12,25 +12,27 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 
 
-api_url = 'http://django-apps-dulrich15.c9.io/eqns/api/equations/'
-# api_url = 'http://django-apps-dulrich15.c9.io/eqns/api/variables/107/equations/'
+def call_api(ob='equations', pk=None, q=None):
+    api_url = 'http://django-apps-dulrich15.c9.io/eqns/api/'
 
-
-def call_eqn_api(pk=None, pg=1):
-    if pk: # pull the equation
-        url = api_url + '{}/'.format(pk)
-    else: # get a list instead
-        url = api_url + '?page={}'.format(pg)
-    return requests.get(url).json()
+    if pk: # pull the object
+        url = api_url + '{}/{}/'.format(ob, pk)
+        return requests.get(url).json()
+    elif q:
+        url = api_url + '{}/?limit=10000&{}'.format(ob, q)
+        return requests.get(url).json()['results']
+    else: # get the whole list
+        url = api_url + '{}/?limit=10000'.format(ob)
+        return requests.get(url).json()['results']
 
 
 def list_equations(request):
     try:
-        pg = int(request.GET['page'])
+        q = 'page={}'.format(int(request.GET['page']))
     except:
-        pg = 1
+        q = None
 
-    data = call_eqn_api(pg=pg)
+    data = call_api(q=q)
 
     next_page = prev_page = None
     if 'next' in data:
@@ -49,55 +51,126 @@ def list_equations(request):
 
 def show_equation(request, pk):
     context = {
-        'eqn': call_eqn_api(pk=pk)
+        'eqn': call_api(pk=pk)
     }
     template = 'show_equation.html'
     return render(request, template, context)
 
 
-def show_solution(request, pk):
-    eqn = call_eqn_api(pk=pk)
+def solve_it(eqn, knowns, x):
     LHS, RHS = eqn['sympy'].split('=')
     e = Eq(sympify(LHS), sympify(RHS))
-    voi = None
 
-    variables = []
+    voi = Symbol(x['symbol']) # upgrade sympy to 0.7.6 if this throws a unicode error
+
     vals = dict()
-    for v in eqn['variables']:
-        if v['name'] in request.POST: # really, they all ought to be...
-            val = request.POST[v['name']]
-            if val == '?':
-                voi = Symbol(v['symbol']) # upgrade sympy to 0.7.6 if this throws a unicode error
-                unknown = v
-            else:
-                try:
-                    value = float(val)
-                    vals[Symbol(v['symbol'])] = value
-                    v['value'] = value
-                except:
-                    v['value'] = 'Not given'
-                variables.append(v)
-
-    if voi is None:
-        return render(request, 'show_error.html', {})
-
-    constants = []
+    for k in knowns:
+        vals[Symbol(k['symbol'])] = k['value']
     for c in eqn['constants']:
         vals[Symbol(c['symbol'])] = c['value']
-        constants.append(c)
 
     answers = solve(e.subs(vals),voi)
     answer = answers[0]
-    unknown['value'] = answer
+
+    return answer.evalf()
+
+
+def show_solution(request, pk):
+    eqn = call_api(pk=pk)
+
+    constants = eqn['constants']
+    variables = eqn['variables']
+
+    knowns, unknowns = [], []
+    for v in variables:
+        val = request.POST.get(v['name'], None)
+        try:
+            v['value'] = float(val)
+            knowns.append(v)
+        except:
+            v['value'] = val
+            unknowns.append(v)
+
+    x = None
+    if len(unknowns) == 1:
+        x = unknowns[0]
+    else:
+        for u in unknowns:
+            if u['value'] == '?':
+                x = u
+
+    if x is None:
+        return render(request, 'show_error.html', {})
+
+    x['value'] = solve_it(eqn, knowns, x)
 
     context = {
         'eqn': eqn,
         'constants': constants,
-        'variables': variables,
-        'parameters': variables + constants,
-        'x': unknown,
+        'variables': knowns,
+        'parameters': knowns + constants,
+        'x': x,
     }
     template = 'show_solution.html'
+    return render(request, template, context)
+
+
+def show_solver(request):
+
+# Initialize problem data
+    # 41 displacement
+    # 42 velocity (final)
+    # 43 time
+    # 44 initial velocity
+    # 45 acceleration
+    knowns = []
+    for (vpk, val) in [(41,-5),(44,0),(45,-5)]:
+        v = call_api(pk=vpk, ob='variables')
+        v['value'] = val
+        knowns.append(v)
+    voi = call_api(pk=42, ob='variables')
+
+# Gather list of potential equations
+    # eqnlist = call_api() # this will pull the whole list
+    eqnlist = call_api(q='system=2&subject=9')
+    solvers = []
+
+# Every time we find an intermediate equation, we need to start over until
+# we solve for the variable of interest ... or run out of equations
+    while True:
+
+# Cycle through the equation list to find a solver equation
+        for eqn in eqnlist:
+            unknowns = []
+            for v in eqn['variables']:
+                if v['id'] not in [k['id'] for k in knowns]:
+                    unknowns.append(v)
+
+# We'll know we find a solver if all but one of the variables is known
+            x = None
+            if len(unknowns) == 1:
+                x = unknowns[0]
+                x['value'] = solve_it(eqn, knowns, x)
+                knowns.append(x)
+                solvers.append((eqn, x))
+                eqnlist.remove(eqn)
+                break
+
+# If variable of interest is known, stop looking. If unknown is still None,
+# then we didn't find a solver: stop looking, it is time to give up.
+        if voi in knowns or x is None:
+            break
+
+# If variable of interest is known then solve it!
+    if voi in knowns:
+        assert False
+        template = 'solver_success.html'
+
+# If variable of interest is not known then give up!
+    else:
+        template = 'solver_givesup.html'
+
+    context = {}
     return render(request, template, context)
 
 

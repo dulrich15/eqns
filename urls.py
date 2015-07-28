@@ -26,6 +26,8 @@ urlpatterns = patterns('',
     url(r'^(?P<pk>[0-9]+)/$', views.show_equation, name='show_equation'),
     url(r'^(?P<pk>[0-9]+)/solution/$', views.show_solution, name='show_solution'),
 
+    url(r'^solver/$', views.show_solver, name='show_solver'),
+
     # url(r'^api/equations/$', equation_list, name='equation-list'),
     # url(r'^api/equations/(?P<pk>[0-9]+)/$', equation_detail, name='equation-detail'),
     # url(r'^api/variables/$', variable_list, name='variable-list'),
