@@ -35,14 +35,11 @@ class Variable(Model):
 class Constant(Model):
     symbol = CharField(max_length=200)
     name = CharField(max_length=200)
-    value = FloatField(null=True, blank=True, help_text='Leave blank for constitutive constants')
-    unit = CharField(max_length=200, null=True, blank=True, help_text='Leave blank for unitless constants')
+    value = FloatField()
+    unit = CharField(max_length=200)
 
     def __unicode__(self):
-        if self.value and self.unit:
-            return '{self.symbol} = {self.value:.3g} {self.unit} ({self.name})'.format(self=self)
-        else:
-            return '{self.symbol} = {self.name}'.format(self=self)
+        return '{self.symbol} = {self.value:.3g} {self.unit} ({self.name})'.format(self=self)
 
     class Meta:
         ordering = ['name', 'symbol']
