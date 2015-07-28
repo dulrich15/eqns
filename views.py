@@ -131,8 +131,7 @@ def show_solver(request):
     voi = call_api(pk=42, ob='variables')
 
 # Gather list of potential equations
-    # eqnlist = call_api() # this will pull the whole list
-    eqnlist = call_api(q='system=2&subject=9')
+    eqnlist = call_api() # this will pull the whole list
     solvers = []
 
 # Every time we find an intermediate equation, we need to start over until
@@ -154,7 +153,7 @@ def show_solver(request):
                 knowns.append(x)
                 solvers.append((eqn, x))
                 eqnlist.remove(eqn)
-                break
+                # break
 
 # If variable of interest is known, stop looking. If unknown is still None,
 # then we didn't find a solver: stop looking, it is time to give up.
@@ -162,7 +161,7 @@ def show_solver(request):
             break
 
 # If variable of interest is known then solve it!
-    if voi in knowns:
+    if voi['id'] in [k['id'] for k in knowns]:
         assert False
         template = 'solver_success.html'
 
