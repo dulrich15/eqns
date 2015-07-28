@@ -1,5 +1,26 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<p>I can do it.</p>
+<p>Given:</p>
+<ul>
+    {% for g in given %}
+    <li>{{ g.name }}, {{ g.symbol }} = {{ g.value }} {{ g.unit.symbol }}</li>
+    {% endfor %}
+</ul>
+<p>The solution is:</p>
+<ul>
+    {% with x=voi %}
+    <li>{{ x.name }}, {{ x.symbol }} = {{ x.value }} {{ x.unit.symbol }}</li>
+    {% endwith %}
+</ul>
+<p>The equations I used are:</p>
+<ol>
+    {% for solver in solvers %}
+    {% with eqn=solver.0 x=solver.1 %}
+    <li>{{ eqn.name }}: ${{ eqn.latex }}$
+    <br>from which I learned that the {{ x.name|lower }} involved is {{ x.value }} {{ x.unit.symbol }}</li>
+    {% endwith %}
+    {% endfor %}
+</ol>
+
 {% endblock %}

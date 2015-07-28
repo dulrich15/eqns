@@ -123,12 +123,13 @@ def show_solver(request):
     # 43 time
     # 44 initial velocity
     # 45 acceleration
-    knowns = []
-    for (vpk, val) in [(41,-5),(44,0),(45,-5)]:
+    given = []
+    for (vpk, val) in [(41,-5),(44,0),(45,-9.8)]:
         v = call_api(pk=vpk, ob='variables')
         v['value'] = val
-        knowns.append(v)
+        given.append(v)
     voi = call_api(pk=42, ob='variables')
+    knowns = given[:]
 
 # Gather list of potential equations
     eqnlist = call_api() # this will pull the whole list
@@ -153,23 +154,32 @@ def show_solver(request):
                 knowns.append(x)
                 solvers.append((eqn, x))
                 eqnlist.remove(eqn)
-                # break
+                break
 
 # If variable of interest is known, stop looking. If unknown is still None,
 # then we didn't find a solver: stop looking, it is time to give up.
-        if voi in knowns or x is None:
+        if x is None:
+            voi = None
             break
 
-# If variable of interest is known then solve it!
-    if voi['id'] in [k['id'] for k in knowns]:
-        assert False
+        if voi['id'] == x['id']:
+            voi = x
+            break
+
+# If variable of interest is known then grab it!
+    if voi:
+        context = {
+            'voi': voi,
+            'given': given,
+            'solvers': solvers,
+        }
         template = 'solver_success.html'
 
 # If variable of interest is not known then give up!
     else:
+        context = {}
         template = 'solver_givesup.html'
 
-    context = {}
     return render(request, template, context)
 
 
